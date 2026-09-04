@@ -6,3 +6,9 @@ venv/
 .DS_Store
 *.zip
 outputs/.matplotlib/
+data/raw_pdfs/*.pdf
+data/extracted_documents/*.txt
+data/vector_store/*.faiss
+data/vector_store/*.json
+data/.embedding_cache/
+.cache/
