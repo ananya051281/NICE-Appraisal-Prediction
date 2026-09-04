@@ -1,6 +1,6 @@
-# Novo Nordisk Hackathon — NICE ML Foundation
+# NICE HTA Decision Intelligence
 
-This repository contains the Person 1 ML/data foundation for a hackathon prototype that predicts a **pilot model probability** of a favourable NICE appraisal from structured, pre-decision evidence fields. It is not a clinical, economic, or NICE decision system.
+This hackathon prototype combines a Person 1 pilot ML layer with a Person 2 document-intelligence/RAG layer. It predicts a **pilot model probability** from structured pre-decision evidence and retrieves source-labelled historical NICE evidence. It is not a clinical, economic, or NICE decision system.
 
 ## Person 1 responsibilities
 
@@ -48,3 +48,27 @@ Group-aware evaluation was assessed, but no metric is reported: the data has 7 b
 - Probabilities are not validated NICE acceptance probabilities and must not be treated as guarantees.
 - SHAP outputs are exploratory because of the extremely small training dataset.
 - What-if outputs are model scenarios, not causal effects.
+
+## Person 2: document intelligence and RAG
+
+Person 2 adds official NICE HTML scraping, transparent text-only PDF extraction (no OCR claim), overlapping chunks, `all-MiniLM-L6-v2` embeddings, a persisted FAISS cosine-similarity store, evidence-grounded explanation assembly, and the Streamlit dashboard. RAG retrieves evidence; it never creates historical decisions, and similarity does not imply causality.
+
+```
+NICE HTML/PDF → extraction → chunks + source metadata → embeddings → FAISS
+                                                             ↓
+Person 1 XGBoost probability + existing per-input SHAP + retrieved evidence → dashboard
+```
+
+The dashboard calls the existing `predict_appraisal`, `explain_prediction`, and `compare_scenario` interfaces. It does not train a second model or modify the target/feature logic.
+
+## Knowledge base and dashboard
+
+```bash
+python -m src.build_knowledge_base                 # supplied source-grounded Q&A demo evidence
+python -m src.build_knowledge_base --ta-id TA875   # official NICE HTML when network is available
+streamlit run app/streamlit_app.py
+```
+
+`data/raw_pdfs/`, `data/extracted_documents/`, and `data/vector_store/` are generated at runtime; large PDFs and generated indexes are intentionally not committed. Before optional LLM narration, copy `.env.example` to `.env` and set `OPENAI_API_KEY`. Without a key, prediction, SHAP, retrieval, evidence snippets, and what-if remain available.
+
+The current ML appraisal dataset remains a very small pilot dataset and does not support production-level generalisation or regulatory-grade prediction. LLM summaries, when enabled, are instructed to use only retrieved evidence and label evidence gaps.

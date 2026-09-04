@@ -5,3 +5,11 @@ xgboost
 shap
 joblib
 matplotlib
+streamlit
+requests
+beautifulsoup4
+lxml
+pypdf
+sentence-transformers
+faiss-cpu
+openai
