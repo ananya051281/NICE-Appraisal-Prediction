@@ -17,7 +17,24 @@ import matplotlib.pyplot as plt
 import shap
 
 from .data_loader import load_binary_ml_data
-from .features import feature_names, prepare_features
+from .features import feature_names, prediction_frame, prepare_features
+
+
+def explain_prediction(features: dict, top_n: int = 5) -> list[dict]:
+    """Return per-input SHAP contributions using the existing saved model artifacts."""
+    if not MODEL_PATH.exists() or not PREPROCESSOR_PATH.exists():
+        raise FileNotFoundError("Model artifacts are absent. Run `python -m src.train` first.")
+    model = joblib.load(MODEL_PATH)
+    preprocessor = joblib.load(PREPROCESSOR_PATH)
+    transformed = preprocessor.transform(prepare_features(prediction_frame(features)))
+    transformed = transformed.toarray() if hasattr(transformed, "toarray") else np.asarray(transformed)
+    values = shap.TreeExplainer(model).shap_values(transformed)
+    if isinstance(values, list):
+        values = values[-1]
+    contributions = [{"feature": name, "contribution": float(value),
+                      "direction": "positive" if value >= 0 else "negative"}
+                     for name, value in zip(feature_names(preprocessor), np.asarray(values)[0])]
+    return sorted(contributions, key=lambda item: abs(item["contribution"]), reverse=True)[:top_n]
 
 
 def generate_shap_outputs() -> tuple[str, str]:
