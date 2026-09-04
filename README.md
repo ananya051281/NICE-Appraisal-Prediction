@@ -72,3 +72,18 @@ streamlit run app/streamlit_app.py
 `data/raw_pdfs/`, `data/extracted_documents/`, and `data/vector_store/` are generated at runtime; large PDFs and generated indexes are intentionally not committed. Before optional LLM narration, copy `.env.example` to `.env` and set `OPENAI_API_KEY`. Without a key, prediction, SHAP, retrieval, evidence snippets, and what-if remain available.
 
 The current ML appraisal dataset remains a very small pilot dataset and does not support production-level generalisation or regulatory-grade prediction. LLM summaries, when enabled, are instructed to use only retrieved evidence and label evidence gaps.
+## 🚀 Live Demo
+
+**Interactive Streamlit Dashboard:**  
+https://nice-appraisal-prediction-hgrnpv5fk8rvrcq6wb6xej.streamlit.app/
+
+**GitHub Repository:**  
+https://github.com/ananya051281/NICE-Appraisal-Prediction
+
+### Features
+
+- HTA acceptance probability prediction
+- SHAP-based explainability
+- Similar historical NICE appraisal retrieval
+- Evidence-grounded HTA analysis
+- What-if scenario simulation
